@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn import metrics
+from xgboost import XGBClassifier, Booster, DMatrix
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
 def correlationMatrix(data):
     data = data.dropna('columns')
@@ -56,3 +58,27 @@ def model_result(y_test, y_pred):
     print(metrics.accuracy_score(y_test,y_pred))
     print("classification_report")
     print(metrics.classification_report(y_test,y_pred))
+
+def xgboost_search(X, y, search_verbose=1):
+    params = {
+    "gamma":[0.5, 1, 1.5, 2, 5],
+    "max_depth":[3,4,5,6],
+    "min_child_weight": [100],
+    "subsample": [0.6, 0.8, 1.0],
+    "colsample_bytree": [0.6, 0.8, 1.0],
+    "learning_rate": [0.1, 0.01, 0.001]
+    }
+    xgb = XGBClassifier(objective="binary:logistic", eval_metric="auc", use_label_encoder=False)
+
+    skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=1234)
+
+    grid_search = GridSearchCV(estimator=xgb, param_grid=params, scoring="roc_auc", n_jobs=1, cv=skf.split(X,y), verbose=search_verbose)
+
+    grid_search.fit(X, y)
+
+    print("Best estimator: ")
+    print(grid_search.best_estimator_)
+    print("Parameters: ", grid_search.best_params_)
+    print("Highest AUC: %.2f" % grid_search.best_score_)
+
+    return grid_search.best_params_
