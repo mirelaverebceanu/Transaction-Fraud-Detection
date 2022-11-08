@@ -64,8 +64,8 @@ def xgboost_search(X, y, search_verbose=1):
     "gamma":[0.5, 1, 1.5, 2, 5],
     "max_depth":[3,4,5,6],
     "min_child_weight": [100],
-    "subsample": [0.6, 0.8, 1.0],
-    "colsample_bytree": [0.6, 0.8, 1.0],
+    "subsample": [0.5, 0.6, 0.8, 1.0],
+    "colsample_bytree": [0.5, 0.6, 0.8, 1.0],
     "learning_rate": [0.1, 0.01, 0.001]
     }
     xgb = XGBClassifier(objective="binary:logistic", eval_metric="auc", use_label_encoder=False)
